@@ -84,12 +84,6 @@ clean: ## Remove compilation and executable files
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
 #______________________________________________________________________________
 
-.PHONY: plot
-plot: ## Open gnuplot
-	@echo -e "$(C_ORA)Opening gnuplot$(NC)"
-	gnuplot plot.gp	
-#______________________________________________________________________________	
-
 .PHONY: help
 help: ## Display help message
 	@echo ""
