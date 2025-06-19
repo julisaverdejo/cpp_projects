@@ -31,7 +31,6 @@ struct DecodeResult {
     bool disparityError;  // True if disparity error
 };
 
-
 // The encoder function implementing the 5B/6B encoding.
 EncoderResult encode(uint16_t datain, bool dispin) {
   // Extract individual bits from datain (only lower 9 bits are used).
@@ -132,6 +131,38 @@ EncoderResult encode(uint16_t datain, bool dispin) {
   return EncoderResult{ dataout, dispout };
 }
 
+DecodeResult decode(uint16_t datin, bool disprtin, bool coderror, bool disperror) {
+  // Extract individual bits from datain (only lower 9 bits are used).
+  bool ai = (datin >> 0) & 1;
+  bool bi = (datin >> 1) & 1;
+  bool ci = (datin >> 2) & 1;
+  bool di = (datin >> 3) & 1;
+  bool ei = (datin >> 4) & 1;
+  bool ii = (datin >> 5) & 1;  
+  bool fi = (datin >> 6) & 1;
+  bool gi = (datin >> 7) & 1;
+  bool hi = (datin >> 8) & 1;
+  bool ji = (datin >> 9) & 1;  
+
+  // Intermediate signals from the first section.
+  bool aeqb = (ai && bi) || (!ai && !bi);
+  bool ceqd = (ci && di) || (!ci && !di);
+  bool p22   = (ai && bi && !ci && !di) ||
+    (ci && di && !ai && !bi) ||
+    (!aeqb && !ceqd);
+  bool p13   = (!aeqb && !ci && !di) || ( !ceqd && !ai && !bi);
+  bool p31   = (!aeqb && ci && di) || ( !ceqd && ai && bi) ;
+  bool p40 = (ai && bi && ci && di);
+  bool p04 = (!ai && !bi && !ci && !di);
+
+  bool disp6a = p31 || (p22 && disprtin) ; // pos disp if p22 and was pos, or p31.
+  bool disp6a2 = p31 && disprtin ;  // disp is ++ after 4 bits
+  bool disp6a0 = p13 && !disprtin ; // -- disp after 4 bits
+    
+  bool disp6b = (((ei && ii && !disp6a0) || (disp6a && (ei || ii)) || disp6a2 ||
+		  (ei && ii && di)) && (ei || ii || di)) ;
+
+}
 
 int main() {
 
