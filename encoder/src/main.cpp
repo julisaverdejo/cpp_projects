@@ -131,54 +131,153 @@ EncoderResult encode(uint16_t datain, bool dispin) {
   return EncoderResult{ dataout, dispout };
 }
 
-DecodeResult decode(uint16_t datin, bool disprtin, bool coderror, bool disperror) {
-  // Extract individual bits from datain (only lower 9 bits are used).
+DecodeResult decode(uint16_t datin, bool disprtin) {
   bool ai = (datin >> 0) & 1;
   bool bi = (datin >> 1) & 1;
   bool ci = (datin >> 2) & 1;
   bool di = (datin >> 3) & 1;
   bool ei = (datin >> 4) & 1;
-  bool ii = (datin >> 5) & 1;  
+  bool ii = (datin >> 5) & 1;
   bool fi = (datin >> 6) & 1;
   bool gi = (datin >> 7) & 1;
   bool hi = (datin >> 8) & 1;
-  bool ji = (datin >> 9) & 1;  
+  bool ji = (datin >> 9) & 1;
 
-  // Intermediate signals from the first section.
   bool aeqb = (ai && bi) || (!ai && !bi);
   bool ceqd = (ci && di) || (!ci && !di);
-  bool p22   = (ai && bi && !ci && !di) ||
-    (ci && di && !ai && !bi) ||
-    (!aeqb && !ceqd);
-  bool p13   = (!aeqb && !ci && !di) || ( !ceqd && !ai && !bi);
-  bool p31   = (!aeqb && ci && di) || ( !ceqd && ai && bi) ;
-  bool p40 = (ai && bi && ci && di);
-  bool p04 = (!ai && !bi && !ci && !di);
+  bool p22 = (ai && bi && !ci && !di) ||
+             (ci && di && !ai && !bi) ||
+             (!aeqb && !ceqd);
+  bool p13 = (!aeqb && !ci && !di) ||
+             (!ceqd && !ai && !bi);
+  bool p31 = (!aeqb && ci && di) ||
+             (!ceqd && ai && bi);
 
-  bool disp6a = p31 || (p22 && disprtin) ; // pos disp if p22 and was pos, or p31.
-  bool disp6a2 = p31 && disprtin ;  // disp is ++ after 4 bits
-  bool disp6a0 = p13 && !disprtin ; // -- disp after 4 bits
-    
+  bool p40 = ai && bi && ci && di;
+  bool p04 = !ai && !bi && !ci && !di;
+
+  bool disp6a = p31 || (p22 && disprtin);
+  bool disp6a2 = p31 && disprtin;
+  bool disp6a0 = p13 && !disprtin;
+
   bool disp6b = (((ei && ii && !disp6a0) || (disp6a && (ei || ii)) || disp6a2 ||
-		  (ei && ii && di)) && (ei || ii || di)) ;
+                (ei && ii && di)) && (ei || ii || di));
 
-  // The 5B/6B decoding special cases where ABCDE != abcde
+  bool p22bceeqi = p22 && bi && ci && (ei == ii);
+  bool p22bncneeqi = p22 && !bi && !ci && (ei == ii);
+  bool p13in = p13 && !ii;
+  bool p31i = p31 && ii;
+  bool p13dei = p13 && di && ei && ii;
+  bool p22aceeqi = p22 && ai && ci && (ei == ii);
+  bool p22ancneeqi = p22 && !ai && !ci && (ei == ii);
+  bool p13en = p13 && !ei;
+  bool anbnenin = !ai && !bi && !ei && !ii;
+  bool abei = ai && bi && ei && ii;
+  bool cdei = ci && di && ei && ii;
+  bool cndnenin = !ci && !di && !ei && !ii;
 
-  bool p22bceeqi = p22 && bi && ci && (ei == ii) ;
-  bool p22bncneeqi = p22 && !bi && !ci && (ei == ii) ;
-  bool p13in = p13 && !ii ;
-  bool p31i = p31 && ii ;
-  bool p13dei = p13 && di && ei && ii ;
-  bool p22aceeqi = p22 && ai && ci && (ei == ii) ;
-  bool p22ancneeqi = p22 && !ai && !ci && (ei == ii) ;
-  bool p13en = p13 && !ei ;
-  bool anbnenin = !ai && !bi && !ei && !ii ;
-  bool abei = ai && bi && ei && ii ;
-  bool cdei = ci && di && ei && ii ;
-  bool cndnenin = !ci && !di && !ei && !ii ;
+  bool p22enin = p22 && !ei && !ii;
+  bool p22ei = p22 && ei && ii;
+  bool p31dnenin = p31 && !di && !ei && !ii;
+  bool p31e = p31 && ei;
 
+  bool compa = p22bncneeqi || p31i || p13dei || p22ancneeqi || 
+             p13en || abei || cndnenin;
+  bool compb = p22bceeqi || p31i || p13dei || p22aceeqi || 
+             p13en || abei || cndnenin;
+  bool compc = p22bceeqi || p31i || p13dei || p22ancneeqi || 
+             p13en || anbnenin || cndnenin;
+  bool compd = p22bncneeqi || p31i || p13dei || p22aceeqi ||
+             p13en || abei || cndnenin;
+  bool compe = p22bncneeqi || p13in || p13dei || p22ancneeqi || 
+             p13en || anbnenin || cndnenin;
 
+  bool a_o = ai ^ compa;
+  bool b_o = bi ^ compb;
+  bool c_o = ci ^ compc;
+  bool d_o = di ^ compd;
+  bool e_o = ei ^ compe;
 
+  bool feqg = (fi && gi) || (!fi && !gi);
+  bool heqj = (hi && ji) || (!hi && !ji);
+  bool fghj22 = (fi && gi && !hi && !ji) ||
+              (!fi && !gi && hi && ji) ||
+              (!feqg && !heqj);
+  bool fghjp13 = (!feqg && !hi && !ji) ||
+               (!heqj && !fi && !gi);
+  bool fghjp31 = ((!feqg) && hi && ji) ||
+               (!heqj && fi && gi);
+
+  bool dispout = (fghjp31 || (disp6b && fghj22) || (hi && ji)) && (hi || ji);
+
+  bool ko = ((ci && di && ei && ii) || (!ci && !di && !ei && !ii) ||
+          (p13 && !ei && ii && gi && hi && ji) ||
+          (p31 && ei && !ii && !gi && !hi && !ji));
+
+  bool alt7 = (fi && !gi && !hi &&
+             ((disprtin && ci && di && !ei && !ii) || ko ||
+              (disprtin && !ci && di && !ei && !ii))) ||
+            (!fi && gi && hi &&
+             ((!disprtin && !ci && !di && ei && ii) || ko ||
+              (!disprtin && ci && !di && ei && ii)));
+
+  bool k28 = (ci && di && ei && ii) || !(ci || di || ei || ii);
+  bool k28p = !(ci || di || ei || ii);
+  bool fo = (ji && !fi && (hi || !gi || k28p)) ||
+          (fi && !ji && (!hi || gi || !k28p)) ||
+          (k28p && gi && hi) ||
+          (!k28p && !gi && !hi);
+  bool go = (ji && !fi && (hi || !gi || !k28p)) ||
+          (fi && !ji && (!hi || gi || k28p)) ||
+          (!k28p && gi && hi) ||
+          (k28p && !gi && !hi);
+  bool ho = ((ji ^ hi) && !((!fi && gi && !hi && ji && !k28p) || (!fi && gi && hi && !ji && k28p) || 
+                          (fi && !gi && !hi && ji && !k28p) || (fi && !gi && hi && !ji && k28p))) ||
+          (!fi && gi && hi && ji) || (fi && !gi && !hi && !ji);
+
+  bool disp6p = (p31 && (ei || ii)) || (p22 && ei && ii);
+  bool disp6n = (p13 && !(ei && ii)) || (p22 && !ei && !ii);
+  bool disp4p = fghjp31;
+  bool disp4n = fghjp13;
+
+  bool coderror = p40 || p04 ||
+                (fi && gi && hi && ji) || (!fi && !gi && !hi && !ji) ||
+                (p13 && !ei && !ii) || (p31 && ei && ii) ||
+                (ei && ii && fi && gi && hi) || (!ei && !ii && !fi && !gi && !hi) ||
+                (ei && !ii && gi && hi && ji) || (!ei && ii && !gi && !hi && !ji) ||
+                (!p31 && ei && !ii && !gi && !hi && !ji) ||
+                (!p13 && !ei && ii && gi && hi && ji) ||
+                (((ei && ii && !gi && !hi && !ji) || (!ei && !ii && gi && hi && ji)) &&
+                 !( (ci && di && ei) || (!ci && !di && !ei) )) ||
+                (disp6p && disp4p) || (disp6n && disp4n) ||
+                (ai && bi && ci && !ei && !ii && ((!fi && !gi) || fghjp13)) ||
+                (!ai && !bi && !ci && ei && ii && ((fi && gi) || fghjp31)) ||
+                (fi && gi && !hi && !ji && disp6p) ||
+                (!fi && !gi && hi && ji && disp6n) ||
+                (ci && di && ei && ii && !fi && !gi && !hi) ||
+                (!ci && !di && !ei && !ii && fi && gi && hi);
+  
+  uint16_t dataout = 0;
+  uint16_t dataout = (ko  << 8) |
+                     (ho  << 7) |
+                     (go  << 6) |
+                     (fo  << 5) |
+                     (e_o << 4) |
+                     (d_o << 3) |
+                     (c_o << 2) |
+                     (b_o << 1) |
+                     (a_o << 0);
+
+  bool disperror = ((disprtin && disp6p) || (disp6n && !disprtin) ||
+                  (disprtin && !disp6n && fi && gi) ||
+                  (disprtin && ai && bi && ci) ||
+                  (disprtin && !disp6n && disp4p) ||
+                  (!disprtin && !disp6p && !fi && !gi) ||
+                  (!disprtin && !ai && !bi && !ci) ||
+                  (!disprtin && !disp6p && disp4n) ||
+                  (disp6p && disp4p) || (disp6n && disp4n));
+
+  return DecodeResult{dataout, dispout, coderror, disperror};
 }
 
 int main() {
