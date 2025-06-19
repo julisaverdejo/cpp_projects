@@ -162,6 +162,23 @@ DecodeResult decode(uint16_t datin, bool disprtin, bool coderror, bool disperror
   bool disp6b = (((ei && ii && !disp6a0) || (disp6a && (ei || ii)) || disp6a2 ||
 		  (ei && ii && di)) && (ei || ii || di)) ;
 
+  // The 5B/6B decoding special cases where ABCDE != abcde
+
+  bool p22bceeqi = p22 && bi && ci && (ei == ii) ;
+  bool p22bncneeqi = p22 && !bi && !ci && (ei == ii) ;
+  bool p13in = p13 && !ii ;
+  bool p31i = p31 && ii ;
+  bool p13dei = p13 && di && ei && ii ;
+  bool p22aceeqi = p22 && ai && ci && (ei == ii) ;
+  bool p22ancneeqi = p22 && !ai && !ci && (ei == ii) ;
+  bool p13en = p13 && !ei ;
+  bool anbnenin = !ai && !bi && !ei && !ii ;
+  bool abei = ai && bi && ei && ii ;
+  bool cdei = ci && di && ei && ii ;
+  bool cndnenin = !ci && !di && !ei && !ii ;
+
+
+
 }
 
 int main() {
