@@ -116,17 +116,29 @@ EncoderResult encode(uint16_t datain, bool dispin) {
   bool bit1 = bo ^ compls6;
   bool bit0 = ao ^ compls6;
 
+  // uint16_t dataout = 0;
+  // dataout |= (bit0 ? 1 : 0) << 9;
+  // dataout |= (bit1 ? 1 : 0) << 8;
+  // dataout |= (bit2 ? 1 : 0) << 7;
+  // dataout |= (bit3 ? 1 : 0) << 6;
+  // dataout |= (bit4 ? 1 : 0) << 5;
+  // dataout |= (bit5 ? 1 : 0) << 4;
+  // dataout |= (bit6 ? 1 : 0) << 3;
+  // dataout |= (bit7 ? 1 : 0) << 2;
+  // dataout |= (bit8 ? 1 : 0) << 1;
+  // dataout |= (bit9 ? 1 : 0) << 0;
+
   uint16_t dataout = 0;
-  dataout |= (bit0 ? 1 : 0) << 9;
-  dataout |= (bit1 ? 1 : 0) << 8;
-  dataout |= (bit2 ? 1 : 0) << 7;
-  dataout |= (bit3 ? 1 : 0) << 6;
-  dataout |= (bit4 ? 1 : 0) << 5;
-  dataout |= (bit5 ? 1 : 0) << 4;
-  dataout |= (bit6 ? 1 : 0) << 3;
-  dataout |= (bit7 ? 1 : 0) << 2;
-  dataout |= (bit8 ? 1 : 0) << 1;
-  dataout |= (bit9 ? 1 : 0) << 0;
+  dataout |= (bit9 ? 1 : 0) << 9;
+  dataout |= (bit8 ? 1 : 0) << 8;
+  dataout |= (bit7 ? 1 : 0) << 7;
+  dataout |= (bit6 ? 1 : 0) << 6;
+  dataout |= (bit5 ? 1 : 0) << 5;
+  dataout |= (bit4 ? 1 : 0) << 4;
+  dataout |= (bit3 ? 1 : 0) << 3;
+  dataout |= (bit2 ? 1 : 0) << 2;
+  dataout |= (bit1 ? 1 : 0) << 1;
+  dataout |= (bit0 ? 1 : 0) << 0;
 
   return EncoderResult{ dataout, dispout };
 }
@@ -257,8 +269,7 @@ DecodeResult decode(uint16_t datin, bool disprtin) {
                 (ci && di && ei && ii && !fi && !gi && !hi) ||
                 (!ci && !di && !ei && !ii && fi && gi && hi);
   
-  uint16_t dataout = 0;
-  uint16_t dataout = (ko  << 8) |
+  uint16_t datout = (ko  << 8) |
                      (ho  << 7) |
                      (go  << 6) |
                      (fo  << 5) |
@@ -277,26 +288,43 @@ DecodeResult decode(uint16_t datin, bool disprtin) {
                   (!disprtin && !disp6p && disp4n) ||
                   (disp6p && disp4p) || (disp6n && disp4n));
 
-  return DecodeResult{dataout, dispout, coderror, disperror};
+  return DecodeResult{datout, dispout, coderror, disperror};
 }
 
 int main() {
 
   EncoderResult result = {0b0, false};
+  DecodeResult  decode_result = {0b0, false, false, false};
 
   uint16_t data_test[] = {0b100111100, 0b0, 0b111, 0b1010, 0b000111100, 0b011111111};
 
   for (int j = 0; j < 6; j++) {
-    std::cout << "EVENT: " << j << "\n";
+    std::cout << "EVENT: " << j << "\n" << std::endl;
+    std::cout << "ENCODER" <<"\n";     
     std::cout << "input: " << data_test[j] << ", disp: " << result.disp << "\n";
 
     result = encode(data_test[j], result.disp);
+    decode_result = decode(result.data, decode_result.disp);
+   
     // Display the dataout as a 10-bit binary string.
     std::cout << "dataout: 0b";
     for (int i = 9; i >= 0; i--) {
         std::cout << ((result.data >> i) & 1);
     }
     std::cout << "\ndispout: " << result.disp << "\n" << std::endl;
+
+    std::cout << "DECODER" <<"\n";  
+    std::cout << "input: 0b";
+    for (int i = 9; i >= 0; i--) {
+        std::cout << ((result.data >> i) & 1);
+    }      
+    std::cout << "\ndataout: "         << decode_result.data;    
+    std::cout << "\ndisp: "            << decode_result.disp;
+    std::cout << "\ncode error: "      << decode_result.codeError;
+    std::cout << "\ndisparity error: " << decode_result.disparityError << "\n" << std::endl; 
+    std::cout << "==========*==========*==========*==========*" << "\n" << std::endl;;    
+
+
   }
 
   return 0;
