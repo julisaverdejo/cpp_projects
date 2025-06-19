@@ -15,12 +15,22 @@
 #include <iomanip>
 #include <string>
 #include <cstdint>
+#include <bitset>
 
 // Structure to hold the encoder's outputs.
 struct EncoderResult {
     uint16_t data; // 10-bit output packed in the lower 10 bits.
     bool     disp;
 };
+
+// Decoder struct
+struct DecodeResult {
+    uint16_t data;        // Decoded 8-bit data
+    bool disp;            // Output running disparity (false = negative, true = positive)    
+    bool codeError;       // True if illegal 10b pattern
+    bool disparityError;  // True if disparity error
+};
+
 
 // The encoder function implementing the 5B/6B encoding.
 EncoderResult encode(uint16_t datain, bool dispin) {
