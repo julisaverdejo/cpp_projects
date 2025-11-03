@@ -1,0 +1,3 @@
+Enter a date (DD/MM/YYYY), and I will tell you the weekday
+The date you enter is: January 01, 2050
+The weekday is: Saturday
