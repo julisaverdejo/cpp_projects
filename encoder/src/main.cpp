@@ -296,9 +296,10 @@ int main() {
   EncoderResult result = {0b0, false};
   DecodeResult  decode_result = {0b0, false, false, false};
 
-  uint16_t data_test[] = {0b100111100, 0b0, 0b111, 0b1010, 0b000111100, 0b011111111};
-
-  for (int j = 0; j < 6; j++) {
+  // uint16_t data_test[] = {0b100111100, 0b000000001, 0b000000010, 0b000000011, 0b011111100};
+  uint16_t data_test[] = {0b100111100, 0b000000001, 0b000000010, 0b000000011, 0b011111100};
+  
+  for (int j = 0; j < 5; j++) {
     std::cout << "EVENT: " << j << "\n" << std::endl;
     std::cout << "ENCODER" <<"\n";     
     std::cout << "input: " << data_test[j] << ", disp: " << result.disp << "\n";
@@ -318,7 +319,8 @@ int main() {
     for (int i = 9; i >= 0; i--) {
         std::cout << ((result.data >> i) & 1);
     }      
-    std::cout << "\ndataout: "         << decode_result.data;    
+    std::cout << "\ndataout: "         << decode_result.data;
+        
     std::cout << "\ndisp: "            << decode_result.disp;
     std::cout << "\ncode error: "      << decode_result.codeError;
     std::cout << "\ndisparity error: " << decode_result.disparityError << "\n" << std::endl; 
