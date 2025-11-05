@@ -4,6 +4,7 @@
 #include <string>
 #include <format>
 #include <vector>
+#include <cctype>
 
 struct Date {
     int day;
@@ -30,19 +31,25 @@ int main(int argc, char* argv[]) {
     }
     
     std::getline(InputFile, filedate);
-    // int i = 0;
-    // // std::vector<int> date_array;
+    // std::vector<int> date_array;
+    // std::string temp;
 
-    // // if (filedate.length() != 10) {
-    // //     std::cout << "You did not enter a valid date" << std::endl;
-    // // } else {
-    // //     while (i < 10) {
-    // //         date_array.push_back()
+    // if (filedate.length() == 10) {
+    //     for (char c : filedate) {
+    //         if (c == '/') {
+    //             date_array.push_back(std::stoi(temp));
+    //             temp.clear();
+    //         } else {
+    //             temp += c;
+    //         } 
+    //     }
+    // } else {
+    //     std::cout << "You did not enter a valid date" << std::endl;
+    //     }
 
-    // //         i++;
-    // //     }
-    // // }
-
+    // for (int v : date_array) {
+    //     std::cout << v << std::endl;
+    // }   
     myDate.day = std::stoi(filedate.substr(0,2));
     myDate.month = std::stoi(filedate.substr(3,2));
     myDate.year = std::stoi(filedate.substr(6,4));
