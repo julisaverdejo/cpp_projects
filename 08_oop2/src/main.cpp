@@ -8,8 +8,9 @@ int main() {
     std::cout << "The area of the triangle is " << triangle1.area() << std::endl;
 
 	//Dynamic creation - object on the heap
+	//Accessing to type using the getter method
 	Triangle* triangle2 = new Triangle(3,3);
-    std::cout << "The area of the triangle is " << triangle2->area() << std::endl;
+    std::cout << "The area of the " << triangle2->getType() << " is " << triangle2->area() << std::endl;
 
     // Cleanup
 	delete triangle2;
