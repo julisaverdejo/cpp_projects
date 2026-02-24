@@ -32,7 +32,9 @@ int main() {
 		j++;
 	}
 
-
+	std::cout << rec1 << "\n";
+	std::cout << &(rec1->type) << "\n";
+	std::cout << &(rec1->length) << "\n";
 
     // Cleanup
 	delete triangle2;
