@@ -1,28 +1,16 @@
 #include <iostream>
-#include "Dog.h"
-#include "Cat.h"
-#include "Zoo.h"
+#include "Dice.h"
+
 
 int main() {
+	Dice* myDice = new Dice();
+	myDice->display()	;
+	myDice->roll();
+	myDice->display();
 
-    //created on the heap	
-	// dog, cat and zoo are pointers
+	std::cout << "Value: " << myDice->getValue() << std::endl;
 
-	// new Dog() - creates the object on the heap, returns a memory address
-	// Dog* dog = - stores that address in the pointer	
-    Dog* dog = new Dog();
-	Cat* cat = new Cat();
-	Zoo* zoo = new Zoo();
-
-    //Use -> to access members 
-	zoo->makeItSpeak(dog);
-	zoo->makeItSpeak(cat);
-
-	delete dog;
-	delete cat;
-	delete zoo;
-
-
+	delete myDice;
 	return 0;
 }
 
