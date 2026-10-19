@@ -1,7 +1,7 @@
 # Directories
 obj/
 bin/
-13_cfg_file/*
+13_cfg_file/
 
 # Files
 *.o
