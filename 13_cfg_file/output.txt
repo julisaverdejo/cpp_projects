@@ -1,0 +1,31 @@
+Classroom {
+    student 0 {
+        name = "Juan";
+        ID = 0;
+        age = 20;
+        aproved = true;
+    }
+
+    student 1 {
+        name = "Juan";
+        ID = 0;
+        age = 20;
+        aproved = true;
+    }
+
+    student 2 {
+        name = "Julisa";
+        ID = 201510277;
+        age = 30;
+        aproved = true;
+    }
+
+    student 3 {
+        name = "Juan";
+        ID = 0;
+        age = 20;
+        aproved = true;
+    }
+
+}
+
