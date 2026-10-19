@@ -2,3 +2,9 @@ Line 0 : hola amigos
 Line 1 : como
 Line 2 : estan
 Line 3 : ?
+Line 4 : Estoy aprendiendo a como leer archivos de texto,
+Line 5 : Pense que un archivo de texto solo podia leerse
+Line 6 : usando argc and argv, no sabia que tambien se podia
+Line 7 : pasar el archivo directamente.
+Line 8 : 
+Line 9 : I'm in shock! :O

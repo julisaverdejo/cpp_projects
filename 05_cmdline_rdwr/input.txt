@@ -2,3 +2,9 @@ hola amigos
 como
 estan
 ?
+Estoy aprendiendo a como leer archivos de texto,
+Pense que un archivo de texto solo podia leerse
+usando argc and argv, no sabia que tambien se podia
+pasar el archivo directamente.
+
+I'm in shock! :O
